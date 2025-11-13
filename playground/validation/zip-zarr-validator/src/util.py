@@ -2,6 +2,7 @@ import os
 
 
 def check_for_zip64_signature(filename):
+    # https://en.wikipedia.org/wiki/ZIP_(file_format)#ZIP64
     """
     Checks the raw bytes of a file for the ZIP64 end of central directory locator signature.
     """
