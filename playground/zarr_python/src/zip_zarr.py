@@ -12,9 +12,20 @@ from zipfile import ZipFile
 def zip_zarr_read(uri):
     store = ZipStore(uri)
     root = zarr.open(store, mode='r')
-    metadata = root.metadata.to_dict()
-    data = [root.get(node) for level, node in enumerate(root)]
+    metadata = root.metadata.to_dict()['attributes']['ome']
+    data = get_zarr_data(root)
     return metadata, data
+
+
+def get_zarr_data(group):
+    data = []
+    for level, node in enumerate(group):
+        node = group.get(node)
+        if isinstance(node, zarr.Group):
+            data.extend(get_zarr_data(node))
+        else:
+            data.append(node)
+    return data
 
 
 def zip_zarr_write(uri, data, dim_order, pixel_size_um):
@@ -114,6 +125,7 @@ def create_transformation_metadata(dim_order, pixel_size_um, scale, translation_
 if __name__ == "__main__":
     #filename = 'C:/Project/slides/6001240.zarr'
     #filename = 'C:/Project/slides/ozx/6001240.ozx'
+    #filename = 'C:/Project/slides/ozx/kingsnake.ozx'
     #result = zip_zarr_read(filename)
     #print(result)
 

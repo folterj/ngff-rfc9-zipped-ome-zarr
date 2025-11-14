@@ -12,7 +12,7 @@ import zarr
 from zarr.storage import ZipStore
 import zipfile
 
-from playground.zarr_python.src.zip_zarr import zip_zarr_write
+from playground.zarr_python.src.zip_zarr import get_zarr_data, zip_zarr_write
 
 
 class ZipZarrValidator:
@@ -36,7 +36,7 @@ class ZipZarrValidator:
         self.store = ZipStore(self.uri)
         self.root = zarr.open(self.store, mode='r')
         self.metadata = self.root.metadata.to_dict()
-        self.data = [self.root.get(node) for level, node in enumerate(self.root)]
+        self.data = get_zarr_data(self.root)
 
     def zip_list_root(self):
         root_paths = set()
@@ -77,7 +77,7 @@ class ZipZarrValidator:
 
     def test_recommendation3(self):
         # The sharding codec SHOULD be used to reduce the number of entries within the ZIP archive.
-        assert self.data[0].metadata.shards, f'No sharding'
+        assert self.data[0].shards, f'No sharding'
 
     def test_recommendation4(self):
         # The root-level zarr.json file SHOULD be the first ZIP file entry and the first entry in the central directory header; other zarr.json files SHOULD follow immediately afterwards, in breadth-first order.
