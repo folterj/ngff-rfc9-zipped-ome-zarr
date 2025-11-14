@@ -28,12 +28,14 @@ def test_zarr_write(uri, data, dim_order, pixel_size_um):
         scale /= scaler.downscale
 
     multiscales = {
-        'version': 0.5,
         'axes': create_axes_metadata(dim_order),
         'name': uri,
         'datasets': datasets,
+        'type': None,
+        'metadata': None,
+        '@type': 'ngff:Image'
     }
-    metadata = {'multiscales': [multiscales]}
+    metadata = {'ome': {'version': '0.5', 'multiscales': [multiscales]}}
 
     # Avoid re-creating root metdata, by providing all metadata in creation of root group
     root = zarr.create_group(store, attributes=metadata)
