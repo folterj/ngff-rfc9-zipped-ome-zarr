@@ -12,7 +12,7 @@ import zarr
 from zarr.storage import ZipStore
 import zipfile
 
-from playground.zarr_python.src.zip_zarr_test import test_zarr_write
+from playground.zarr_python.src.zip_zarr import zip_zarr_write
 
 
 class ZipZarrValidator:
@@ -25,7 +25,7 @@ class ZipZarrValidator:
                 # Add temp dir
                 self.temp_dir = tempfile.TemporaryDirectory()
                 uri = os.path.join(self.temp_dir.name, uri)
-                test_zarr_write(uri, data, dim_order, pixel_size)
+                zip_zarr_write(uri, data, dim_order, pixel_size)
             elif os.path.exists(uri):
                 raise FileExistsError(f'File already exists: {uri}')
 
@@ -92,11 +92,15 @@ class ZipZarrValidator:
 
     def test_recommendation5(self):
         # The ZIP archive comment SHOULD contain null-terminated UTF-8-encoded JSON with an ome attribute that holds a version key with the OME-Zarr version as string value, equivalent to {"ome": { "version": "XX.YY" }}.
-        comment = json.loads(self.zip.comment.decode("utf-8").replace("'", '"'))
-        assert isinstance(comment, dict), f'metadata dictionary comment expected instead of "{comment}"'
-        assert 'ome' in comment, f'[ome] in comment dict expected'
-        assert 'version' in comment['ome'], f'[ome][version] in comment dict expected'
-        assert re.fullmatch(r'\d.\d', comment['ome']['version']) is not None, f'version: "XX.YY" in comment dict expected instead of {comment['ome']['version']}'
+        comment = self.zip.comment.decode('utf-8')
+        if comment:
+            comment_dict = json.loads(comment.replace("'", '"'))
+        else:
+            comment_dict = {}
+        assert isinstance(comment_dict, dict), f'metadata dictionary comment expected instead of "{comment_dict}"'
+        assert 'ome' in comment_dict, f'[ome] in comment dict expected'
+        assert 'version' in comment_dict['ome'], f'[ome][version] in comment dict expected'
+        assert re.fullmatch(r'\d.\d', comment_dict['ome']['version']) is not None, f'version: "XX.YY" in comment dict expected instead of {comment_dict['ome']['version']}'
 
     def test_recommendation6(self):
         # The name of OME-Zarr zip files SHOULD end with .ozx.
@@ -109,6 +113,7 @@ class ZipZarrValidator:
 
 class TestModelZipZarr:
     # no __init__ for pytest!
+
     validator = ZipZarrValidator('C:/Project/slides/ozx/6001240.ozx')
 
     def test_requirement12(self):
