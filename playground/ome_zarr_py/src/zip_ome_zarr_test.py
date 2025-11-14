@@ -16,7 +16,7 @@ def _get_ome_zarr_reader(uri):
     return reader, nodes
 
 
-def test_ome_zarr_read(filename, level=0):
+def zip_ome_zarr_read(filename, level=0):
     reader, nodes = _get_ome_zarr_reader(filename)
     # nodes may include images, labels etc
     if len(nodes) == 0:
@@ -28,13 +28,13 @@ def test_ome_zarr_read(filename, level=0):
     return metadata, data
 
 
-def test_ome_zarr_write(uri, data):
+def zip_ome_zarr_write(uri, data):
     store = ZipStore(uri, mode='w')
     root = zarr.create_group(store) # creates basic root zarr.json
     writer.write_image(image=data, group=root) # updates root zarr.json various times, writes pyramid metadata & data interlaced
 
 
-def test_ome_zarr_write_regular_zarr(uri, data):
+def ome_zarr_write_zarr(uri, data):
     root = zarr.create_group(uri)
     writer.write_image(image=data, group=root)
 
@@ -42,12 +42,12 @@ def test_ome_zarr_write_regular_zarr(uri, data):
 if __name__ == "__main__":
     #filename = 'C:/Project/slides/6001240.zarr'
     #filename = 'C:/Project/slides/ozx/6001240.ozx'
-    #result = test_ome_zarr_read(filename)
+    #result = zip_ome_zarr_read(filename)
     #print(result)
 
     filename = 'C:/Project/slides/ozx/test.ozx'
     data = np.random.rand(100, 100)
-    test_ome_zarr_write(filename, data)
+    zip_ome_zarr_write(filename, data)
 
-    result = test_ome_zarr_read(filename) # Doesn't work, unable to use external store
+    result = zip_ome_zarr_read(filename) # Doesn't work, unable to use external store
     print(result)

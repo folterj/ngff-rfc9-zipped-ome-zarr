@@ -12,7 +12,7 @@ import zarr
 from zarr.storage import ZipStore
 import zipfile
 
-from playground.zarr_python.src.zip_zarr_test import test_zarr_write
+from playground.zarr_python.src.zip_zarr_test import zip_zarr_write
 
 
 class ZipZarrValidator:
@@ -25,7 +25,7 @@ class ZipZarrValidator:
                 # Add temp dir
                 self.temp_dir = tempfile.TemporaryDirectory()
                 uri = os.path.join(self.temp_dir.name, uri)
-                test_zarr_write(uri, data, dim_order, pixel_size)
+                zip_zarr_write(uri, data, dim_order, pixel_size)
             elif os.path.exists(uri):
                 raise FileExistsError(f'File already exists: {uri}')
 

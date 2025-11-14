@@ -4,7 +4,7 @@ import zarr
 from zarr.storage import ZipStore
 
 
-def test_zarr_read(uri):
+def zip_zarr_read(uri):
     store = ZipStore(uri)
     root = zarr.open(store, mode='r')
     metadata = root.metadata.to_dict()
@@ -12,7 +12,7 @@ def test_zarr_read(uri):
     return metadata, data
 
 
-def test_zarr_write(uri, data, dim_order, pixel_size_um):
+def zip_zarr_write(uri, data, dim_order, pixel_size_um):
     pyramid_datas = []
     zarr_datas = []
     store = ZipStore(uri, mode='w')
@@ -102,14 +102,14 @@ def create_transformation_metadata(dim_order, pixel_size_um, scale, translation_
 if __name__ == "__main__":
     #filename = 'C:/Project/slides/6001240.zarr'
     #filename = 'C:/Project/slides/ozx/6001240.ozx'
-    #result = test_zarr_read(filename)
+    #result = zip_zarr_read(filename)
     #print(result)
 
     filename = 'C:/Project/slides/ozx/test.ozx'
     data = np.random.rand(100, 100)
     dim_order = 'yx'
     pixel_size = {'x': 1, 'y': 1}
-    test_zarr_write(filename, data, dim_order, pixel_size)
+    zip_zarr_write(filename, data, dim_order, pixel_size)
 
-    result = test_zarr_read(filename)
+    result = zip_zarr_read(filename)
     print(result)
