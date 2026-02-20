@@ -1,16 +1,31 @@
+# https://en.wikipedia.org/wiki/ZIP_(file_format)#ZIP64
+
 import os
+import zipfile
 
 
 def check_for_zip64_signature(filename):
-    # https://en.wikipedia.org/wiki/ZIP_(file_format)#ZIP64
+    """
+    Checks if the file contains the ZIP64 end of central directory locator signature.
+    """
+
+    try:
+        with open(filename, 'rb') as f:
+            end_rec = zipfile._EndRecData(f)
+            sig = end_rec[0] if end_rec else None
+            return sig == zipfile.stringEndArchive64 or sig == zipfile.stringEndArchive64Locator
+    except IOError as e:
+        print(f"Error reading file: {e}")
+        return False
+
+
+def check_for_zip64_signature_raw(filename):
     """
     Checks the raw bytes of a file for the ZIP64 end of central directory locator signature.
     """
     # Define the magic signature for the Zip64 end of central directory locator
     # (bytes for 'PK\x06\x07')
-    ZIP64_EOCD_LOCATOR_SIGNATURE = b'\x50\x4b\x06\x07'
-    # The EOCD locator is typically found 20 bytes before the standard EOCD record
-    ZIP64_EOCD_LOCATOR_SIZE = 20
+    ZIP64_EOCD_LOCATOR_SIGNATURE = zipfile.stringEndArchive64Locator
     EOCD_RECORD_SIZE = 22  # Minimum size
 
     try:
@@ -30,10 +45,7 @@ def check_for_zip64_signature(filename):
             f.seek(0 - search_window, os.SEEK_END)
             data = f.read(search_window)
 
-            if ZIP64_EOCD_LOCATOR_SIGNATURE in data:
-                return True
-            else:
-                return False
+            return ZIP64_EOCD_LOCATOR_SIGNATURE in data
 
     except IOError as e:
         print(f"Error reading file: {e}")

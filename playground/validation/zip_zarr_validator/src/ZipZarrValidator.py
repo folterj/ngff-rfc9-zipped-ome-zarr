@@ -12,7 +12,7 @@ from ome_zarr_models.base import BaseAttrs
 from zarr.storage import ZipStore
 
 from playground.zarr_python.src.zip_zarr import zip_zarr_write, get_zarr_data
-#from playground.validation.zip_zarr_validator.src.util import check_for_zip64_signature
+from playground.validation.zip_zarr_validator.src.util import check_for_zip64_signature
 
 
 class ZipZarrValidator:
@@ -67,8 +67,7 @@ class ZipZarrValidator:
 
     def test_recommendation1(self):
         # The ZIP64 format extension SHOULD be used, irrespective of the ZIP file size.
-        #assert check_for_zip64_signature(self.uri) == True, 'ZIP64 format extension should be used'
-        assert True # TODO: check if this can be detected; recommendation under review
+        assert check_for_zip64_signature(self.uri) == True, 'ZIP64 format extension should be used'
 
     def test_recommendation2(self):
         # ZIP-level compression SHOULD be disabled in favor of Zarr-level compression codecs.
